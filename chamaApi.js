@@ -5,7 +5,7 @@ const corpoTabelaPersonagens = document.getElementById('corpoTabelaPersonagens')
 
 function buscarDadosEPreencherTabela() {
     // Faz uma requisição GET para a API.
-    axios.get('http://infopguaifpr.com.br:3052/listarTodosUsuarios')
+    axios.get('localhost:3000/listarTodosUsuarios')
         .then(response => {
             console.log(response)
 
@@ -80,7 +80,7 @@ botaoChamarAPI.addEventListener('click', () => {
 });
 
 function deletarUsuario(idUsuario){
-    axios.delte(`http://infopguaifpr.com.br:3052/deletarUsuario/${idUsuario} `).then(response =>{
+    axios.delte(`localhost:3000/deletarUsuario/${idUsuario} `).then(response =>{
         console.log('Usuario excluido com sucesso');
 
         buscarDadosEPreencherTabela();
@@ -111,7 +111,7 @@ function cadastrarUsuario(nome, email, disciplina, senha){
         senha: senha
     }
 
-    axios.post('http://infopguaifpr.com.br:3052/cadastrarUsuario', novoUsuario, {
+    axios.post(`localhost:3000/cadastrarUsuario`, novoUsuario, {
         headers: {
             'Content Type' : 'application/json'
         }
@@ -135,3 +135,29 @@ document.querySelector('#btnCadastrarUsuario').addEventListener('click', functio
 
     cadastrarUsuario(nome, email, disciplina, senha);
 });
+
+function carregaModal(idUsuario){
+    axios.get(`localhost:3000/pegarUsuarioPeloId/$(idUsuario)`)
+    .then(response => {
+        $('#editarUsuario').modal('show');
+        usuario = response.data.usuario;
+
+        const nome = document.querySelector('#nomeEditar');
+        nome.value = usuario.nome;
+
+        const email = document.querySelector('#emailEditar');
+        email.value = usuario.email;
+
+        const disciplina = document.querySelector('#disciplinaEditar');
+        disciplina.value = usuario.disciplina;
+    }).catch(error => {
+        console.log('Error fetching character data: ', error);
+    })
+}
+
+document.addEventListener('click', function (event){
+    if(event.target && event.target.classList.contains('btn-edit')) {
+        const idUsuario = event.target.dataset.id;
+        carregaModal(idUsuario);
+    }
+})
